@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+uploads/
+qdrant_data/
+docflow.db

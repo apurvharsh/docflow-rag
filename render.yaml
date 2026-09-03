@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: docflow-rag
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.api.search:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: AUTH_USERNAME
+        value: admin
+      - key: AUTH_PASSWORD
+        sync: false
+      - key: DATABASE_PATH
+        value: /var/data/docflow.db
+      - key: QDRANT_PATH
+        value: /var/data/qdrant_data
+      - key: UPLOADS_PATH
+        value: /var/data/uploads
+      - key: DEV_TENANT_ID
+        value: production
+      - key: DEV_USER_ID
+        value: admin
+      - key: DEV_ORG_ADMIN
+        value: "true"
+      - key: DEV_SENSITIVITY_CLEARANCE
+        value: "3"
+    disk:
+      name: docflow-data
+      mountPath: /var/data
+      sizeGB: 10

@@ -1,0 +1,19 @@
+qdrant-client>=1.9.0
+fastapi>=0.110.0
+python-multipart>=0.0.9
+pypdf>=5.0.0
+python-docx>=1.1.0
+python-pptx>=0.6.23
+uvicorn[standard]>=0.29.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.0
+
+# Embeddings / reranking (uncomment what you settle on)
+# sentence-transformers>=2.6.0      # for BGE dense + bge-reranker cross-encoder
+# fastembed>=0.2.6                  # Qdrant's own lib; supports sparse (SPLADE) too
+# cohere>=5.0.0                     # if using Cohere rerank instead
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

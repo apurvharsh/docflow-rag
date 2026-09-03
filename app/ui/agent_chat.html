@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DocFlow Agent Console</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 32px auto;
+            padding: 24px;
+        }
+
+        .header {
+            margin-bottom: 24px;
+        }
+
+        .command-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        button {
+            background: #1d4ed8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+        }
+
+        .panel {
+            background: #111827;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        #log {
+            min-height: 300px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .inputs {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        input {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 12px;
+        }
+
+        .muted {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DocFlow Agent Console</h1>
+            <div class="muted">Commands: /draft, /scan, /rag, /query</div>
+        </div>
+        <div class="command-row">
+            <button data-command="/draft">/draft</button>
+            <button data-command="/scan">/scan</button>
+            <button data-command="/rag">/rag</button>
+            <button data-command="/query">/query</button>
+        </div>
+        <div class="panel" id="log">Agent console ready.
+
+            Use /draft to create a document.
+            Use /scan to score a draft or pasted document.
+        </div>
+        <div class="inputs">
+            <input id="message" placeholder="Type a command or prompt..." />
+            <button id="send">Send</button>
+        </div>
+    </div>
+    <script>
+        const state = { active_agent: null, document_type: null, project_stage: null, draft_status: 'new', current_content: '', ready_for_scan: false, scan_result: null, saved_document: null };
+        const logEl = document.getElementById('log');
+        const inputEl = document.getElementById('message');
+        const append = (text) => {
+            logEl.textContent += '\n\n' + text;
+            logEl.scrollTop = logEl.scrollHeight;
+        };
+        const sendMessage = async () => {
+            const message = inputEl.value.trim();
+            if (!message) return;
+            append('You: ' + message);
+            inputEl.value = '';
+            const response = await fetch('/agent/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message, state })
+            });
+            const data = await response.json();
+            append('Agent: ' + data.response);
+            Object.assign(state, data.state || {});
+        };
+        document.getElementById('send').addEventListener('click', sendMessage);
+        inputEl.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') sendMessage();
+        });
+        document.querySelectorAll('[data-command]').forEach((button) => {
+            button.addEventListener('click', () => {
+                inputEl.value = button.dataset.command;
+                sendMessage();
+            });
+        });
+    </script>
+</body>
+
+</html>
